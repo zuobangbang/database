@@ -1,0 +1,998 @@
+mysql操作合集
+
+1.mysql启动与关闭
+1.1mysql启动
+PATH="$PATH":/usr/local/mysql/bin
+mysql -u root -p
+
+1.1mysql关闭
+exit
+
+2.mysql数据库
+create database testdatabase;(创建数据库testdatabase)
+show databases;（用来查看数据库是否创建成功）
+use testdatabase;(进入testdatabase数据库)
+
+3.表操作
+3.1创建表
+create table if not exists student(
+    id int primary key,
+    name varchar(10),
+    gender varchar(10),
+    score int not null);
+
+3.2检查表student是否创建成功
+show tables;
++------------------------+
+| Tables_in_testdatabase |
++------------------------+
+| student                |
++------------------------+
+1 row in set (0.00 sec)
+
+3.3查看表student的结构
+desc student;/describe student;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+
+3.4修改表名
+alter table student rename newstudent;
+show tables;
++------------------------+
+| Tables_in_testdatabase |
++------------------------+
+| newstudent             |
++------------------------+
+
+3.5对表newstudent添加列
+3.5.1添加在最后
+alter table newstudent add size varchar(10);
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
+| size   | varchar(10) | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+3.5.2添加在最前面
+alter table newstudent add userid int not null first;
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| userid | int(11)     | NO   |     | NULL    |       |
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+3.5.3添加在某个字段之后
+alter table newstudent add user_id int after name;
+desc newstudent;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| userid  | int(11)     | NO   |     | NULL    |       |
+| id      | int(11)     | NO   | PRI | NULL    |       |
+| name    | varchar(10) | YES  |     | NULL    |       |
+| user_id | int(11)     | NO   |     | NULL    |       |
+| gender  | varchar(10) | YES  |     | NULL    |       |
+| score   | int(11)     | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+
+3.6修改字段名(修改后的字段一定要加上字段的类型，不然会报错)
+alter table newstudent change user_id idd int;/alter table newstudent change user_id idd int not null;
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| userid | int(11)     | NO   |     | NULL    |       |
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| idd    | int(11)     | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+
+3.7对表newstudent删除列
+alter table newstudent drop size;
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+3.8表某字段添加默认值
+alter table newstudent alter userid set default 1001;
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| userid | int(11)     | NO   |     | 1001    |       |
+| id     | int(11)     | NO   | PRI | 100     |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+3.9表某字段删除默认值
+alter table newtable alter id drop default;
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| userid | int(11)     | NO   |     | 1001    |       |
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | int(11)     | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+3.10插入全表字段数据
+insert into newstudent values(10011,1,"张三","男",83);
+selece * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
++--------+----+--------+--------+-------+
+
+3.11插入部分字段数据
+3.11.1
+insert into newstudent(id,name,gender,score) values(2,"李四","女",87);
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|   1001 |  2 | 李四   | 女     |    87 |
++--------+----+--------+--------+-------+
+#李四的userid 默认值为1001;
+3.11.2
+insert into newstudent(score) values(100);
+报错： Field 'id' doesn't have a default value
+原因：返回到3.9，在desc newstudent后，userid , id, score都有约束not null;所以插入时必须要有值；但userid可以不用，因为有默认值；
+3.11.3
+insert into newstudent(id,score) values(3,100);
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|   1001 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | NULL   |   100 |
++--------+----+--------+--------+-------+
+这种情况就可以insert成功，因为name,gender没有约束not null；所以插入时缺少这个值就默认为null;
+
+3.12更新数据
+update newstudent  set userid=10012 where id=2;
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | NULL   |   100 |
++--------+----+--------+--------+-------+
+
+3.13删除数据
+delect from newstudent where name='NULL';
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | NULL   |   100 |
++--------+----+--------+--------+-------+
+删除失败，原因：这里的null是空值，而不是name就叫null
+
+delect from newstudent where name is NULL;
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
++--------+----+--------+--------+-------+
+
+3.14 关于null部分的select
+现有数据表
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+3.14.1 
+select * from newstudent where gender='男'
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|   1001 |  3 | NULL   | 男     |    90 |
++--------+----+--------+--------+-------+
+
+3.14.2 
+select * from newstudent where gender!='男';
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  4 | NULL   | 女     |    97 |
++--------+----+--------+--------+-------+
+
+3.14.3
+select * from newstudent where gender is null;    (is null)
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+3.14.4 返回gender!='男'的包括gender is null的所有值
+selece * from newstudent where ifnull(gender,'')!='男'
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+3.14.5 返回name!='张三'的包括name is null的所有值
+select * from newstudent where ifnull(name,'')!='张三';     (ifnull)
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+要点：ifnull(a,b)
+如果a为null则返回b的值，如果a不为null则返回a的值
+
+3.14.6 select column1,column2,column3 from newstudent where condition1 and condition2;
+select userid,name,score,id from newstudent where ifnull(name,'')!='张三' and score>85 and userid=1001;
++--------+--------+-------+----+
+| userid | name   | score | id |
++--------+--------+-------+----+
+|   1001 | NULL   |    90 |  3 |
+|   1001 | NULL   |    97 |  4 |
+|   1001 | 王五   |    97 |  5 |
+|   1001 | 打人   |    97 |  6 |
++--------+--------+-------+----+
+
+3.14.7 逻辑词 not and or beetween in like
+3.14.7.1  not
+select * from newstudent where gender not in ('女');
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|   1001 |  3 | NULL   | 男     |    90 |
++--------+----+--------+--------+-------+
+
+3.14.7.2  and
+select * from newstudent where score=97 and gender='女';
++--------+----+------+--------+-------+
+| userid | id | name | gender | score |
++--------+----+------+--------+-------+
+|   1001 |  4 | NULL | 女     |    97 |
++--------+----+------+--------+-------+
+
+3.14.7.3  or 
+select * from newstudent where score=97 or gender='女';
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+3.14.7.4  beetween
+select * from newstudent where score between 85 and 95;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | 男     |    90 |
++--------+----+--------+--------+-------+
+
+3.14.7.5  in
+select * from newstudent where score in (87,90,97);
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+3.14.7.6 like
+select * from newstudent where name like '张%' or name like '%人' or score like '_0';
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+要点：'%'代表多个字符；'_'代表一个字符；'q'代表字母q
+
+3.15返回唯一值
+3.15.1
+select distinct score from newstudent;
++-------+--------+
+| score | name   |
++-------+--------+
+|    83 | 张三   |
+|    87 | 李四   |
+|    90 | NULL   |
+|    97 | NULL   |
+|    97 | 王五   |
+|    97 | 打人   |
++-------+--------+
+3.15.2
+select distinct score,userid from newstudent;
++-------+--------+
+| score | userid |
++-------+--------+
+|    83 |  10011 |
+|    87 |  10012 |
+|    90 |   1001 |
+|    97 |   1001 |
++-------+--------+
+3.15.3
+select distinct score and userid from newstudent;
++------------------+
+| score and userid |
++------------------+
+|                1 |
++------------------+
+
+3.16 limit 规定只返回多少行
+select * from newstudent limit 2;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
++--------+----+--------+--------+-------+
+要点：limit2 相当于 top 2
+
+select * from newstudent limit 2,2;
++--------+----+------+--------+-------+
+| userid | id | name | gender | score |
++--------+----+------+--------+-------+
+|   1001 |  3 | NULL | 男     |    90 |
+|   1001 |  4 | NULL | 女     |    97 |
++--------+----+------+--------+-------+
+要点:limit a,b 返回从a开始一共b条数据
+
+3.17 order by
+select * from newstudent order by userid;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
++--------+----+--------+--------+-------+
+要点：order by 只能用在最后
+
+3.18修改某个字段的数据类型
+alter table newstudent modify userid varchar(10);
+desc newstudent;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| userid | int(11)     | NO   |     | 1001    |       |
+| id     | int(11)     | NO   | PRI | NULL    |       |
+| name   | varchar(10) | YES  |     | NULL    |       |
+| gender | varchar(10) | YES  |     | NULL    |       |
+| score  | varchar(10) | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+4.视图
+4.1创建视图
+create view viewtable as select * from newstudent where id >3;
+Query OK, 0 rows affected (0.00 sec)
+4.2 查看viewtable
+select * from viewtable;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+4.3 撤销视图
+show tables;
++------------------------+
+| Tables_in_testdatabase |
++------------------------+
+| newstudent             |
+| viewtable              |
++------------------------+
+drop view viewtables;
+show tables;
++------------------------+
+| Tables_in_testdatabase |
++------------------------+
+| newstudent             |
++------------------------+
+
+5.两个表间的操作
+创建表
+CREATE TABLE test (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(20) DEFAULT NULL,
+  course varchar(20) DEFAULT NULL,
+  score int(11) DEFAULT NULL,
+  PRIMARY KEY (id)
+) 
+插入数据
+insert into test(name,course,score)
+values
+('张三','语文',80),
+('李四','语文',90),
+('王五','语文',93),
+('张三','数学',77),
+('李四','数学',68),
+('王五','数学',99),
+('张三','英语',90),
+('李四','英语',50),
+('王五','英语',89);
+
+select * from test;
++----+--------+--------+-------+
+| id | name   | course | score |
++----+--------+--------+-------+
+|  1 | 张三   | 语文   |    80 |
+|  2 | 李四   | 语文   |    90 |
+|  3 | 王五   | 语文   |    93 |
+|  4 | 张三   | 数学   |    77 |
+|  5 | 李四   | 数学   |    68 |
+|  6 | 王五   | 数学   |    99 |
+|  7 | 张三   | 英语   |    90 |
+|  8 | 李四   | 英语   |    50 |
+|  9 | 王五   | 英语   |    89 |
++----+--------+--------+-------+
+select * from newstudent;
++--------+----+--------+--------+-------+
+| userid | id | name   | gender | score |
++--------+----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     |    83 |
+|  10012 |  2 | 李四   | 女     |    87 |
+|   1001 |  3 | NULL   | 男     |    90 |
+|   1001 |  4 | NULL   | 女     |    97 |
+|   1001 |  5 | 王五   | NULL   |    97 |
+|   1001 |  6 | 打人   | NULL   |    97 |
++--------+----+--------+--------+-------+
+
+5.1
+select newstudent.id,newstudent.name,test.cid,test.name from newstudent,test where newstudent.id=test.cid;
++----+--------+-----+--------+
+| id | name   | cid | name   |
++----+--------+-----+--------+
+|  1 | 张三   |   1 | 张三   |
+|  2 | 李四   |   2 | 李四   |
+|  3 | NULL   |   3 | 王五   |
+|  4 | NULL   |   4 | 张三   |
+|  5 | 王五   |   5 | 李四   |
+|  6 | 打人   |   6 | 王五   |
++----+--------+-----+--------+
+
+5.2 inner join 内连接
+select * from a inner join b on a.id=b.id
+a为主表，将b表中符合a.id=b.id的部分join到表a
+select * from newstudent inner join test on newstudent.name=test.name; 
++--------+----+--------+--------+-------+-----+--------+--------+-------+
+| userid | id | name   | gender | score | cid | name   | course | score |
++--------+----+--------+--------+-------+-----+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     | 83    |   1 | 张三   | 语文   |    80 |
+|  10012 |  2 | 李四   | 女     | 87    |   2 | 李四   | 语文   |    90 |
+|   1001 |  5 | 王五   | NULL   | 97    |   3 | 王五   | 语文   |    93 |
+|  10011 |  1 | 张三   | 男     | 83    |   4 | 张三   | 数学   |    77 |
+|  10012 |  2 | 李四   | 女     | 87    |   5 | 李四   | 数学   |    68 |
+|   1001 |  5 | 王五   | NULL   | 97    |   6 | 王五   | 数学   |    99 |
+|  10011 |  1 | 张三   | 男     | 83    |   7 | 张三   | 英语   |    90 |
+|  10012 |  2 | 李四   | 女     | 87    |   8 | 李四   | 英语   |    50 |
+|   1001 |  5 | 王五   | NULL   | 97    |   9 | 王五   | 英语   |    89 |
++--------+----+--------+--------+-------+-----+--------+--------+-------+
+select * from test inner join newstudent on test.name=newstudent.name;
++-----+--------+--------+-------+--------+----+--------+--------+-------+
+| cid | name   | course | score | userid | id | name   | gender | score |
++-----+--------+--------+-------+--------+----+--------+--------+-------+
+|   1 | 张三   | 语文   |    80 |  10011 |  1 | 张三   | 男     | 83    |
+|   2 | 李四   | 语文   |    90 |  10012 |  2 | 李四   | 女     | 87    |
+|   3 | 王五   | 语文   |    93 |   1001 |  5 | 王五   | NULL   | 97    |
+|   4 | 张三   | 数学   |    77 |  10011 |  1 | 张三   | 男     | 83    |
+|   5 | 李四   | 数学   |    68 |  10012 |  2 | 李四   | 女     | 87    |
+|   6 | 王五   | 数学   |    99 |   1001 |  5 | 王五   | NULL   | 97    |
+|   7 | 张三   | 英语   |    90 |  10011 |  1 | 张三   | 男     | 83    |
+|   8 | 李四   | 英语   |    50 |  10012 |  2 | 李四   | 女     | 87    |
+|   9 | 王五   | 英语   |    89 |   1001 |  5 | 王五   | NULL   | 97    |
++-----+--------+--------+-------+--------+----+--------+--------+-------+
+
+5.3 left join 左连接
+select * from a left join b on a.name=b.name;
+左连接从左表产生一套完整的记录，再与匹配的记录（右表b)进行匹配，生成的新表格顺序以匹配的记录为准，没有匹配则为null
+
+select * from test left join newstudent on test.name=newstudent.name;
++-----+--------+--------+-------+--------+------+--------+--------+-------+
+| cid | name   | course | score | userid | id   | name   | gender | score |
++-----+--------+--------+-------+--------+------+--------+--------+-------+
+|   1 | 张三   | 语文   |    80 |  10011 |    1 | 张三   | 男     | 83    |
+|   4 | 张三   | 数学   |    77 |  10011 |    1 | 张三   | 男     | 83    |
+|   7 | 张三   | 英语   |    90 |  10011 |    1 | 张三   | 男     | 83    |
+|   2 | 李四   | 语文   |    90 |  10012 |    2 | 李四   | 女     | 87    |
+|   5 | 李四   | 数学   |    68 |  10012 |    2 | 李四   | 女     | 87    |
+|   8 | 李四   | 英语   |    50 |  10012 |    2 | 李四   | 女     | 87    |
+|   3 | 王五   | 语文   |    93 |   1001 |    5 | 王五   | NULL   | 97    |
+|   6 | 王五   | 数学   |    99 |   1001 |    5 | 王五   | NULL   | 97    |
+|   9 | 王五   | 英语   |    89 |   1001 |    5 | 王五   | NULL   | 97    |
++-----+--------+--------+-------+--------+------+--------+--------+-------+
+
+select * from newstudent left join test on test.name=newstudent.name;
++--------+----+--------+--------+-------+------+--------+--------+-------+
+| userid | id | name   | gender | score | cid  | name   | course | score |
++--------+----+--------+--------+-------+------+--------+--------+-------+
+|  10011 |  1 | 张三   | 男     | 83    |    1 | 张三   | 语文   |    80 |
+|  10012 |  2 | 李四   | 女     | 87    |    2 | 李四   | 语文   |    90 |
+|   1001 |  5 | 王五   | NULL   | 97    |    3 | 王五   | 语文   |    93 |
+|  10011 |  1 | 张三   | 男     | 83    |    4 | 张三   | 数学   |    77 |
+|  10012 |  2 | 李四   | 女     | 87    |    5 | 李四   | 数学   |    68 |
+|   1001 |  5 | 王五   | NULL   | 97    |    6 | 王五   | 数学   |    99 |
+|  10011 |  1 | 张三   | 男     | 83    |    7 | 张三   | 英语   |    90 |
+|  10012 |  2 | 李四   | 女     | 87    |    8 | 李四   | 英语   |    50 |
+|   1001 |  5 | 王五   | NULL   | 97    |    9 | 王五   | 英语   |    89 |
+|   1001 |  3 | NULL   | 男     | 90    | NULL | NULL   | NULL   |  NULL |
+|   1001 |  4 | NULL   | 女     | 97    | NULL | NULL   | NULL   |  NULL |
+|   1001 |  6 | 打人   | NULL   | 97    | NULL | NULL   | NULL   |  NULL |
++--------+----+--------+--------+-------+------+--------+--------+-------+
+
+5.4 left join 左连接
+selece * from a left join b on a.key=b.key where b.key is null;
+与5.3的左连接不同的是，仅保留a表a.key！=b.key的部分，同时将表b的字段左连接到表a
+
+select * from newstudent left join test on newstudent.name=test.name where test.name is null;
++--------+----+--------+--------+-------+------+------+--------+-------+
+| userid | id | name   | gender | score | cid  | name | course | score |
++--------+----+--------+--------+-------+------+------+--------+-------+
+|   1001 |  3 | NULL   | 男     | 90    | NULL | NULL | NULL   |  NULL |
+|   1001 |  4 | NULL   | 女     | 97    | NULL | NULL | NULL   |  NULL |
+|   1001 |  6 | 打人   | NULL   | 97    | NULL | NULL | NULL   |  NULL |
++--------+----+--------+--------+-------+------+------+--------+-------+
+以newstudent表为基准，将newstudent.name=test.name的部分去掉，再把test表的字段左连接到newstudent表
+
+select * from test left join newstudent on newstudent.name=test.name where newstudent.name is null;
+Empty set (0.00 sec)
+返回空值的原因：以test表为基准，但test表的name字段“张三”，“李四”，“王五”在newstudent表都存在，所以去掉相同部分后test为空
+
+desc下这个表结构desc select * from test left join newstudent on newstudent.name=test.name where newstudent.name is null;
++----+-------------+------------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+
+| id | select_type | table      | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                              |
++----+-------------+------------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+
+|  1 | SIMPLE      | test       | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    9 |   100.00 | NULL                                               |
+|  1 | SIMPLE      | newstudent | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    6 |    16.67 | Using where; Using join buffer (Block Nested Loop) |
++----+-------------+------------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+
+
+5.5 right join 右连接
+select * from a right join b on a.key=b.key;
+以表b为基准，将表a匹配项（a.key=b.key）右连接，与表b匹配，生成内容以匹配的记录为准，没有匹配则为null
+
+
+select * from test right join newstudent on test.name=newstudent.name;
++------+--------+--------+-------+--------+----+--------+--------+-------+
+| cid  | name   | course | score | userid | id | name   | gender | score |
++------+--------+--------+-------+--------+----+--------+--------+-------+
+|    1 | 张三   | 语文   |    80 |  10011 |  1 | 张三   | 男     | 83    |
+|    2 | 李四   | 语文   |    90 |  10012 |  2 | 李四   | 女     | 87    |
+|    3 | 王五   | 语文   |    93 |   1001 |  5 | 王五   | NULL   | 97    |
+|    4 | 张三   | 数学   |    77 |  10011 |  1 | 张三   | 男     | 83    |
+|    5 | 李四   | 数学   |    68 |  10012 |  2 | 李四   | 女     | 87    |
+|    6 | 王五   | 数学   |    99 |   1001 |  5 | 王五   | NULL   | 97    |
+|    7 | 张三   | 英语   |    90 |  10011 |  1 | 张三   | 男     | 83    |
+|    8 | 李四   | 英语   |    50 |  10012 |  2 | 李四   | 女     | 87    |
+|    9 | 王五   | 英语   |    89 |   1001 |  5 | 王五   | NULL   | 97    |
+| NULL | NULL   | NULL   |  NULL |   1001 |  3 | NULL   | 男     | 90    |
+| NULL | NULL   | NULL   |  NULL |   1001 |  4 | NULL   | 女     | 97    |
+| NULL | NULL   | NULL   |  NULL |   1001 |  6 | 打人   | NULL   | 97    |
++------+--------+--------+-------+--------+----+--------+--------+-------+
+
+select * from newstudent right join test on newstudent.name=test.name;
++--------+------+--------+--------+-------+-----+--------+--------+-------+
+| userid | id   | name   | gender | score | cid | name   | course | score |
++--------+------+--------+--------+-------+-----+--------+--------+-------+
+|  10011 |    1 | 张三   | 男     | 83    |   1 | 张三   | 语文   |    80 |
+|  10011 |    1 | 张三   | 男     | 83    |   4 | 张三   | 数学   |    77 |
+|  10011 |    1 | 张三   | 男     | 83    |   7 | 张三   | 英语   |    90 |
+|  10012 |    2 | 李四   | 女     | 87    |   2 | 李四   | 语文   |    90 |
+|  10012 |    2 | 李四   | 女     | 87    |   5 | 李四   | 数学   |    68 |
+|  10012 |    2 | 李四   | 女     | 87    |   8 | 李四   | 英语   |    50 |
+|   1001 |    5 | 王五   | NULL   | 97    |   3 | 王五   | 语文   |    93 |
+|   1001 |    5 | 王五   | NULL   | 97    |   6 | 王五   | 数学   |    99 |
+|   1001 |    5 | 王五   | NULL   | 97    |   9 | 王五   | 英语   |    89 |
++--------+------+--------+--------+-------+-----+--------+--------+-------+
+
+5.6 right join 右连接
+select * from a right join b on a.key=b.key where a.key is null;
+和5.5右连接不同的是：以表b为基准，先把a.key=b.key的部分从表b去除；再把表a的字段粘贴过来
+
+select * from test right join newstudent on test.name=newstudent.name where test.name is null;
++------+------+--------+-------+--------+----+--------+--------+-------+
+| cid  | name | course | score | userid | id | name   | gender | score |
++------+------+--------+-------+--------+----+--------+--------+-------+
+| NULL | NULL | NULL   |  NULL |   1001 |  3 | NULL   | 男     | 90    |
+| NULL | NULL | NULL   |  NULL |   1001 |  4 | NULL   | 女     | 97    |
+| NULL | NULL | NULL   |  NULL |   1001 |  6 | 打人   | NULL   | 97    |
++------+------+--------+-------+--------+----+--------+--------+-------+
+
+select * from newstudent right join test on newstudent.name=test.name where newstudent.name is null;
+Empty set (0.00 sec)
+返回空值原因同上5.4
+
+5.7 full outer join 全连接
+select * from a full join b on a.key=b.key;
+不知道为什么这个语法一直报错，网上找了一种替代法：join + union(去重)
+select * from A left join B on A.id = B.id union select * from A right join B on A.id = B.id;
+select * from newstudent left join test on newstudent.name=test.name union select *  from newstudent right join test on newstudent.name=test.name;
++--------+------+--------+--------+-------+------+--------+--------+-------+
+| userid | id   | name   | gender | score | cid  | name   | course | score |
++--------+------+--------+--------+-------+------+--------+--------+-------+
+|  10011 |    1 | 张三   | 男     | 83    |    1 | 张三   | 语文   |    80 |
+|  10012 |    2 | 李四   | 女     | 87    |    2 | 李四   | 语文   |    90 |
+|   1001 |    5 | 王五   | NULL   | 97    |    3 | 王五   | 语文   |    93 |
+|  10011 |    1 | 张三   | 男     | 83    |    4 | 张三   | 数学   |    77 |
+|  10012 |    2 | 李四   | 女     | 87    |    5 | 李四   | 数学   |    68 |
+|   1001 |    5 | 王五   | NULL   | 97    |    6 | 王五   | 数学   |    99 |
+|  10011 |    1 | 张三   | 男     | 83    |    7 | 张三   | 英语   |    90 |
+|  10012 |    2 | 李四   | 女     | 87    |    8 | 李四   | 英语   |    50 |
+|   1001 |    5 | 王五   | NULL   | 97    |    9 | 王五   | 英语   |    89 |
+|   1001 |    3 | NULL   | 男     | 90    | NULL | NULL   | NULL   |  NULL |
+|   1001 |    4 | NULL   | 女     | 97    | NULL | NULL   | NULL   |  NULL |
+|   1001 |    6 | 打人   | NULL   | 97    | NULL | NULL   | NULL   |  NULL |
++--------+------+--------+--------+-------+------+--------+--------+-------+
+
+5.8 union
+select key1 from a union select key2 from b;
+select name,id,score from newstudent union select name,cid,score from test;
++--------+----+-------+
+| name   | id | score |
++--------+----+-------+
+| 张三   |  1 | 83    |
+| 李四   |  2 | 87    |
+| NULL   |  3 | 90    |
+| NULL   |  4 | 97    |
+| 王五   |  5 | 97    |
+| 打人   |  6 | 97    |
+| 张三   |  1 | 80    |
+| 李四   |  2 | 90    |
+| 王五   |  3 | 93    |
+| 张三   |  4 | 77    |
+| 李四   |  5 | 68    |
+| 王五   |  6 | 99    |
+| 张三   |  7 | 90    |
+| 李四   |  8 | 50    |
+| 王五   |  9 | 89    |
++--------+----+-------+
+注意：union 后的表字段是引用表a的字段名
+
+5.9 union all
+select key1 from a union all select key2 from  b;
+select name from test union all select userid from newstudent;
++--------+
+| name   |
++--------+
+| 张三   |
+| 李四   |
+| 王五   |
+| 张三   |
+| 李四   |
+| 王五   |
+| 张三   |
+| 李四   |
+| 王五   |
+| 10011  |
+| 10012  |
+| 1001   |
+| 1001   |
+| 1001   |
+| 1001   |
++--------+
+
+5.10 求两个表格的非相同部分
+SELECT * FROM A LEFT JOIN B ON A.name = B.name
+WHERE B.id IS NULL
+union
+SELECT * FROM A right JOIN B ON A.name = B.name
+WHERE A.id IS NULL;
+select * from test right join newstudent on test.name=newstudent.name where test.name is null union select * from test left join newstudent on newstudent.name=test.name where newstudent.name is null;
++------+------+--------+-------+--------+------+--------+--------+-------+
+| cid  | name | course | score | userid | id   | name   | gender | score |
++------+------+--------+-------+--------+------+--------+--------+-------+
+| NULL | NULL | NULL   |  NULL |   1001 |    3 | NULL   | 男     | 90    |
+| NULL | NULL | NULL   |  NULL |   1001 |    4 | NULL   | 女     | 97    |
+| NULL | NULL | NULL   |  NULL |   1001 |    6 | 打人   | NULL   | 97    |
++------+------+--------+-------+--------+------+--------+--------+-------+
+
+6.约束
+6.1 unique
+unique约束用来标识数据库表中每条记录；
+在一个表中，可以使某一列有unique约束，也可以多列一起unique约束
+6.1.1 
+CREATE TABLE persons
+(
+id int NOT NULL,
+lastname varchar(255) NOT NULL,
+firstName varchar(255),
+city varchar(255),
+CONSTRAINT uc_PersonID UNIQUE (id,lastname)
+);
+这个表将id,lastname共同作为表persons的约束，确保id+lastname不重复
+要注意的是uc_PersonID是虚拟的，不属于表真实存在的字段。
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | NO   | PRI | NULL    |       |
+| lastname  | varchar(255) | NO   | PRI | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.1.2-1
+insert into persons(id,lastname,firstname) values (1,'z','q');
+Query OK, 1 row affected (0.00 sec)
+6.1.2-2
+insert into persons(id,lastname,firstname) values (2,'z','q');
+Query OK, 1 row affected (0.01 sec)
+此时虽然lastname重复了'z'，但是id+lastname分别为1+'z'和2+'z'；所以不算重复，因此插入成功
+6.1.2-3
+insert into persons(id,lastname,firstname) values (2,'zz','q');
+Query OK, 1 row affected (0.01 sec)
+和第二次（6.1.2-2）插入的数据相比，虽然id重复了都为2，但lastname分别为"z"和'zz';所以id+lastname分别为2+'z'和2+'zz'；所以不算重复，因此插入成功
+6.1.2-4
+insert into persons(id,lastname,firstname) values (2,'zz','q');
+ERROR 1062 (23000): Duplicate entry '2-zz' for key 'uc_PersonID'
+在第四次操作时，由于id+lastname重复为2+'zz'，约束项uc_PersonID重复，所以报错。
+
+6.1.3
+删除unique约束
+alter table persons drop index uc_PersonID;
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | NO   |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.2 not null约束
+not null 约束强制列不接受null值。
+再拿6.1.3的表persons做说明，可以看到id和lastname字段是存在not null约束的，所以在insert时必须要传入这两个字段的值
+insert into persons(id,lastname) values (3,'q');
+Query OK, 1 row affected (0.00 sec)
+插入成功，下面试一下insert时不给id赋值的情况:
+insert into persons(lastname) values ('q');
+ERROR 1364 (HY000): Field 'id' doesn't have a default value
+成功的报错了，除非你有给id定一个default（默认值），否则在insert时不给id赋值一定会报错。
+select * from persons;
++----+----------+-----------+------+
+| id | lastname | firstName | city |
++----+----------+-----------+------+
+|  1 | z        | q         | NULL |
+|  2 | z        | q         | NULL |
+|  2 | zz       | q         | NULL |
+|  3 | q        | NULL      | NULL |
++----+----------+-----------+------+
+总结：有not null约束的字段一定要赋值，没有not null约束的比如city字段在insert时不赋值会自动为null
+删除not null 约束
+alter table persons modify id int null;
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | YES  |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.3 check 约束
+6.3.1 
+ALTER TABLE Persons ADD CHECK (id>0);
+insert into persons(id,lastname) values (-2,'qq');
+Query OK, 1 row affected (0.00 sec)
+非常奇怪，check约束明明加进去了，但是id=-2还可以被插入；
+select * from persons;
++------+----------+-----------+------+
+| id   | lastname | firstName | city |
++------+----------+-----------+------+
+|    1 | z        | q         | NULL |
+|    2 | z        | q         | NULL |
+|    2 | zz       | q         | NULL |
+|    3 | q        | NULL      | NULL |
+|   -2 | qq       | NULL      | NULL |
++------+----------+-----------+------+
+刚刚insert的数据已经进入表中了。。。
+6.3.2 
+百度以后，发现这个mysql本身的问题，想要达到约束效果可以使用type=enum()；具体方法如下：
+在原表基础上加入gender字段，规定gender只能为male或者female；
+alter table persons add gender enum('male' ,'female');
+desc persons;
++-----------+-----------------------+------+-----+---------+-------+
+| Field     | Type                  | Null | Key | Default | Extra |
++-----------+-----------------------+------+-----+---------+-------+
+| id        | int(11)               | YES  |     | NULL    |       |
+| lastname  | varchar(255)          | NO   |     | NULL    |       |
+| firstName | varchar(255)          | YES  |     | NULL    |       |
+| city      | varchar(255)          | YES  |     | NULL    |       |
+| gender    | enum('male','female') | YES  |     | NULL    |       |
++-----------+-----------------------+------+-----+---------+-------+
+表persons的gender成功变为type为enum('male' ,'female')；
+insert into persons1(id,lastname,gender) values (3,'qqq','male1');
+ERROR 1265 (01000): Data truncated for column 'gender' at row 1
+insert into persons1(id,lastname,gender) values (3,'qqq','male');
+Query OK, 1 row affected (0.00 sec)
+6.3.3
+删除enum('male' ,'female')约束
+alter table persons modify gender varchar(255);
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | YES  |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
+| gender    | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.4 default 约束
+6.4.1
+创建default 约束
+alter table persons alter city set default '上海';
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | YES  |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | 上海    |       |
+| gender    | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+6.4.2
+删除default 约束
+alter table persons alter city drop  default;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | YES  |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
+| gender    | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.5 primary key
+primary key约束：
+用来唯一标识数据库表中的每条记录；主键必须包含唯一的值且不能含有null值。与6.1unique约束不同的是，unique约束能同时对好几个字段增加唯一约束，而primary约束只能对某一列创建唯一约束。在一个表中只能有一个primary约束。
+6.5.1创建primary 约束
+alter table persons add primary key(id);
+ERROR 1062 (23000): Duplicate entry '2' for key 'PRIMARY'
+原因：给表persons的id字段增加primary约束，这需要id字段的内容保持唯一性，而现在id=2有好几条数据，所以报错。
+先将表中id=2的字段删除，再给id增加primary约束
+delete from persons where id=2;
+alter table persons add primary key(id);
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | NO   | PRI | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
+| gender    | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+6.5.2 删除primary 约束
+alter table persons drop primary key;
+desc persons;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int(11)      | NO   |     | NULL    |       |
+| lastname  | varchar(255) | NO   |     | NULL    |       |
+| firstName | varchar(255) | YES  |     | NULL    |       |
+| city      | varchar(255) | YES  |     | NULL    |       |
+| gender    | varchar(255) | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+6.6 foreign key
+
+create table my_foreign1(
+    id int primary key auto_increment,
+    name varchar(20) not null comment '学生姓名',
+    c_id int comment '班级表ID',
+    foreign key(c_id) references newstudent(id)  
+)charset utf8;
+
+
+alter table newstudent add foreign key (userid) references test(userid);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
